@@ -2,7 +2,7 @@
   "nombre": "Luna-Worker",
   "modelo": {
     "proveedor": "gemini",
-    "modelo": "gemini-2.5-flash-lite",
+    "modelo": "gemini-2.0-flash",
     "baseURL": "https://generativelanguage.googleapis.com",
     "temperature": 0.3,
     "maxTokens": 800,
