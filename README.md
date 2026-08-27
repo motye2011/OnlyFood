@@ -130,7 +130,46 @@ Gemini tiene **free tier 1.500 req/día** -> MVP4 gratis durante piloto.
 
 Si cobras **$25 - $40 / mes por restaurante**, con 10 clientes ya eres rentable.
 
-### 3.5 Tiempo de Entrega - 30 Días (Equipo 5)
+### 3.5 Presupuesto Completo para Patrocinio (Hackatón) - 6 y 12 meses
+
+> **Para presentar a patrocinador si ganan - Costo real de operación post-hackatón**
+
+**A. Costos Únicos (una sola vez)**
+
+| Concepto | Costo USD | Costo COP* |
+| :--- | :--- | :--- |
+| Dominio onlyfood.com (1 año) + SSL | $15 | $60.000 |
+| Diseño UI/UX + branding | $0 (equipo) | $0 |
+| Lote inicial 3D (50 productos demo con Meshy) | $15 | $60.000 |
+| **Subtotal único** | **$30** | **$120.000** |
+
+**B. Costos Mensuales Recurrentes (Producción)**
+
+| Concepto | Proveedor | Mensual USD | Mensual COP |
+| :--- | :--- | :--- | :--- |
+| Backend/DB/Auth/Realtime/Storage 8GB | Supabase Pro | $25 | $100.000 |
+| Hosting Frontend + Edge | Vercel Pro (team) | $20 | $80.000 |
+| VPS Luna-Worker + Worker 3D | Oracle Free Tier (gratis 2 años) / Fly.io | $0 - $15 | $0 - $60.000 |
+| Almacenamiento modelos 3D/CDN (100GB) | Supabase Storage + Cloudflare R2 | $10 | $40.000 |
+| IA 3D - 100 modelos/mes nuevos | Meshy API $0.25 c/u | $25 | $100.000 |
+| IA Luna-Worker 20 restaurantes (100 consultas/día c/u) | Gemini 2.5 Flash-Lite $1.5 c/u | $30 | $120.000 |
+| Monitoreo/logs (Sentry, Uptime) | Hobby | $10 | $40.000 |
+| **Subtotal mensual (20 restaurantes)** | | **$120 - $135** | **$480.000 - $540.000** |
+| **Subtotal mensual (50 restaurantes)** | | **$155** | **$620.000** |
+
+**C. Paquete Patrocinio Propuesto**
+
+| Paquete | Duración | Total USD | Total COP | Qué cubre |
+| :--- | :--- | :--- | :--- | :--- |
+| **Piloto** | 6 meses | **$750** | **$3.000.000** | Infra completa + 20 restaurantes + 300 modelos 3D |
+| **Escala** | 12 meses | **$1.500** | **$6.000.000** | Infra + 50 restaurantes + 600 modelos 3D |
+| **Piloto + Estipendio equipo (opcional)** | 6 meses | **$2.500** | **$10.000.000** | Anterior + $290/mes estipendio 5 integrantes |
+
+* Tasa referencia: $1 USD = $4.000 COP
+
+> **Nota patrocinador:** Con $750 por 6 meses la plataforma opera sin costo para 20 restaurantes piloto. A $30/mes por restaurante, con 10 clientes ya se autofinancia ($300/mes ingreso vs $135 costo = **$165 utilidad/mes**). El patrocinio solo es capital semilla, luego es autosostenible. Infra Oracle Free reduce $180/año.
+
+### 3.6 Tiempo de Entrega - 30 Días (Equipo 5)
 
 > **Deadline: 1 mes - Entrega completa MVP1-MVP5 con 5 integrantes**
 
