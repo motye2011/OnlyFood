@@ -76,6 +76,7 @@ export default async function ProductosPage() {
                 <td className="p-3">
                   <div className="font-medium">{p.nombre}</div>
                   <div className="text-xs text-zinc-500">{p.descripcion?.slice(0,50)}</div>
+                  {p.ingredientes && <div className="text-[11px] text-yellow-300/70 mt-1">Ing: {p.ingredientes.slice(0,60)}</div>}
                 </td>
                 <td className="p-3 text-zinc-400">{p.category?.nombre ?? '-'}</td>
                 <td className="p-3">${Number(p.precio).toLocaleString()}</td>
