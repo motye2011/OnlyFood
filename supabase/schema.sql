@@ -25,7 +25,7 @@ do $$ begin create type model_status as enum ('pendiente','generando','listo','e
 -- Compatibilidad local: si no es Supabase, crea schema auth mock
 create schema if not exists auth;
 create table if not exists auth.users (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   email text unique,
   created_at timestamptz default now()
 );
@@ -34,7 +34,7 @@ create table if not exists auth.users (
 -- 3. RESTAURANTES (TENANT PRINCIPAL)
 -- ============================================================
 create table if not exists restaurants (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   nombre text not null,
   slug text unique not null, -- ej: onlyfood.com/r/slug o /menu/slug
   descripcion text,
@@ -75,7 +75,7 @@ create index if not exists idx_profiles_rol on profiles(rol);
 -- 5. CATEGORIAS
 -- ============================================================
 create table if not exists categories (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   restaurant_id uuid not null references restaurants(id) on delete cascade,
   nombre text not null,
   descripcion text,
@@ -90,7 +90,7 @@ create index if not exists idx_categories_restaurant on categories(restaurant_id
 -- 6. PRODUCTOS
 -- ============================================================
 create table if not exists products (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   restaurant_id uuid not null references restaurants(id) on delete cascade,
   category_id uuid references categories(id) on delete set null,
   nombre text not null,
@@ -112,7 +112,7 @@ create index if not exists idx_products_disponible on products(restaurant_id, di
 
 -- Galería de imágenes por producto (opcional, hasta 5 por producto para 3D)
 create table if not exists product_images (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   product_id uuid not null references products(id) on delete cascade,
   url text not null,
   orden int default 0,
@@ -124,7 +124,7 @@ create index if not exists idx_product_images_product on product_images(product_
 -- 7. EXTRAS
 -- ============================================================
 create table if not exists extras (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   restaurant_id uuid not null references restaurants(id) on delete cascade,
   nombre text not null,
   precio numeric(10,2) default 0 check (precio >= 0),
@@ -142,7 +142,7 @@ create table if not exists product_extras (
 -- 8. MESAS + QR + SESIONES CLIENTE
 -- ============================================================
 create table if not exists mesas (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   restaurant_id uuid not null references restaurants(id) on delete cascade,
   numero int not null,
   nombre text, -- "Mesa 01 - Terraza"
@@ -160,7 +160,7 @@ create index if not exists idx_mesas_estado on mesas(restaurant_id, estado);
 
 -- Sesiones de cliente tras escanear QR (para asociar pedidos a mesa sin login)
 create table if not exists mesa_sessions (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   mesa_id uuid not null references mesas(id) on delete cascade,
   restaurant_id uuid not null references restaurants(id) on delete cascade,
   token text unique not null default encode(gen_random_bytes(16), 'hex'),
@@ -183,7 +183,7 @@ create index if not exists idx_sessions_token on mesa_sessions(token);
 -- 'cancelado' = cancelado
 -- Realtime escucha esta tabla para actualizar panel y cliente en <1s
 create table if not exists orders (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   restaurant_id uuid not null references restaurants(id) on delete cascade,
   mesa_id uuid not null references mesas(id) on delete restrict,
   session_id uuid references mesa_sessions(id) on delete set null,
@@ -235,7 +235,7 @@ create trigger trg_assign_order_number before insert on orders for each row exec
 -- 10. ITEMS DEL PEDIDO
 -- ============================================================
 create table if not exists order_items (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   order_id uuid not null references orders(id) on delete cascade,
   product_id uuid not null references products(id) on delete restrict,
   product_nombre text not null, -- snapshot por si cambia nombre luego
@@ -249,7 +249,7 @@ create index if not exists idx_order_items_order on order_items(order_id);
 create index if not exists idx_order_items_product on order_items(product_id);
 
 create table if not exists order_item_extras (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   order_item_id uuid not null references order_items(id) on delete cascade,
   extra_id uuid not null references extras(id) on delete restrict,
   extra_nombre text not null,
@@ -274,7 +274,7 @@ create trigger trg_recalc_total_insert after insert or update or delete on order
 -- 11. HISTORIAL DE ESTADOS (AUDITORIA - para Luna y panel)
 -- ============================================================
 create table if not exists order_status_history (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   order_id uuid not null references orders(id) on delete cascade,
   estado_anterior order_status,
   estado_nuevo order_status not null,
@@ -318,7 +318,7 @@ create trigger trg_sync_mesa after insert or update on orders for each row execu
 -- 12. MODELOS 3D
 -- ============================================================
 create table if not exists product_models (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   product_id uuid not null references products(id) on delete cascade,
   restaurant_id uuid not null references restaurants(id) on delete cascade,
   status model_status default 'pendiente',
@@ -338,7 +338,7 @@ create index if not exists idx_models_restaurant on product_models(restaurant_id
 -- 13. ANALITICA (MVP5)
 -- ============================================================
 create table if not exists qr_scans (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   restaurant_id uuid not null references restaurants(id) on delete cascade,
   mesa_id uuid references mesas(id) on delete set null,
   session_id uuid references mesa_sessions(id) on delete set null,
@@ -349,7 +349,7 @@ create table if not exists qr_scans (
 create index if not exists idx_qr_scans_restaurant on qr_scans(restaurant_id, scanned_at desc);
 
 create table if not exists product_views (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   restaurant_id uuid not null references restaurants(id) on delete cascade,
   product_id uuid not null references products(id) on delete cascade,
   mesa_id uuid references mesas(id) on delete set null,
@@ -359,7 +359,7 @@ create table if not exists product_views (
 create index if not exists idx_views_product on product_views(product_id, viewed_at);
 
 create table if not exists model_views (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   restaurant_id uuid not null references restaurants(id) on delete cascade,
   product_id uuid not null references products(id) on delete cascade,
   tipo text check (tipo in ('3d','ar')),
