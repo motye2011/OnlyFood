@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import LunaChat from './LunaChat';
 
 const RESTAURANT_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -46,20 +47,8 @@ export default async function LunaPage() {
         </div>
       </div>
 
-      <div className="mt-6 bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-        <h3 className="font-semibold mb-2">Chat con Luna (placeholder)</h3>
-        <div className="bg-zinc-950 border border-zinc-800 rounded p-3 text-sm space-y-2">
-          <div className="text-zinc-400">Ejemplos que podrá hacer:</div>
-          <div className="bg-zinc-800 p-2 rounded">Tú: <span className="text-white">¿Cuántos pedidos pendientes?</span></div>
-          <div className="bg-green-500/10 p-2 rounded">Luna: <span className="text-green-300">Hay {pedidosPendientes} pendientes: {Number(d?.nuevos ?? 0)} nuevos y {Number(d?.en_preparacion ?? 0)} en preparación.</span> <span className="text-xs text-zinc-500">[tool:get_pedidos]</span></div>
-          <div className="bg-zinc-800 p-2 rounded">Tú: <span className="text-white">Cambia la hamburguesa clásica a $27.000</span></div>
-          <div className="bg-green-500/10 p-2 rounded">Luna: <span className="text-green-300">Listo, precio actualizado. ¿Confirmo?</span> <span className="text-xs text-zinc-500">[tool:update_precio]</span></div>
-        </div>
-        <div className="text-xs text-zinc-600 mt-3">Integración: copiar luna-2.0 → /onlyfood/src/lib/luna/ con psique-trabajador.js, tools-restaurante.js, modelo.js (Gemini). Endpoint: POST /api/luna/chat</div>
-        <div className="flex gap-2 mt-4">
-          <button disabled className="bg-zinc-800 text-zinc-500 px-4 py-2 rounded text-sm cursor-not-allowed">Conectar Gemini (próximo sprint día 20-26)</button>
-          <span className="text-xs text-zinc-600 py-2">Listo para sprint 4 — solo falta wirear modelo.js</span>
-        </div>
+      <div className="mt-6">
+        <LunaChat />
       </div>
 
       <div className="mt-4 text-xs text-zinc-600">
