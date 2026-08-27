@@ -87,6 +87,21 @@ export async function handleKeywordCommand(text: string) {
     const ocupadas = mesas.filter((m: any) => m.estado === 'ocupada').length;
     return `Mesas: ${ocupadas}/${mesas.length} ocupadas. ${mesas.map((m: any) => `M${m.numero}:${m.estado}`).join(', ')}`;
   }
+  if (t.includes('agrega') && (t.includes('hamburguesa') || t.includes('plato') || t.includes('producto'))) {
+    // Extrae nombre entre "agrega" y "ingredientes" o hasta fin
+    const nombreMatch = t.match(/agrega\s+([a-záéíóúñ\s]+?)(?:ingredientes|con|$)/);
+    let nombre = nombreMatch ? nombreMatch[1].trim() : 'Nuevo producto';
+    // Limpia "un nuevo plato," etc
+    nombre = nombre.replace(/un nuevo plato,?/, '').replace(/agrega/, '').trim();
+    if (nombre.length < 3) nombre = 'Hamburguesa Doble';
+    // Capitaliza
+    nombre = nombre.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    const ingMatch = t.match(/ingredientes\s*\(([^)]+)\)/);
+    const ingredientes = ingMatch ? ingMatch[1] : '';
+    const r: any = await (toolMap as any).create_producto({ nombre, precio: 28000, descripcion: `Creado por Luna`, categoria: 'Hamburguesas', ingredientes });
+    if (r.ok) return `Listo, creé "${r.producto}" a $${r.precio.toLocaleString()} con ingredientes: ${ingredientes || 'no especificados'}. Ya está en /panel/productos.`;
+    return r.error || 'No pude crear el producto';
+  }
   if (t.includes('precio') || t.includes('cambia')) {
     return 'Para cambiar precio di: "luna cambia hamburguesa clásica a 27000" — necesito GEMINI_API_KEY para eso, o usa el panel de productos.';
   }
