@@ -26,20 +26,20 @@ export default async function PedidosPage() {
     entregado: orders.filter((o) => o.estado === 'entregado'),
   };
 
-  const Column = ({ title, estado, orders, next }: any) => (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3">
-      <h3 className="font-semibold text-sm mb-3 flex justify-between">
-        {title} <span className="bg-zinc-800 px-2 py-0.5 rounded text-xs">{orders.length}</span>
+  const Column = ({ title, orders, next }: any) => (
+    <div className="bg-white border border-[#e8d5d0] rounded-lg p-3">
+      <h3 className="font-light text-sm mb-3 flex justify-between text-[#1a1a1a]" style={{ fontFamily: 'Playfair Display, serif' }}>
+        {title} <span className="bg-[#fdfbf7] border border-[#e8d5d0] px-2 py-0.5 rounded text-xs">{orders.length}</span>
       </h3>
       <div className="space-y-3">
         {orders.map((o: any) => (
-          <div key={o.id} className="bg-zinc-950 border border-zinc-800 rounded p-3">
-            <div className="flex justify-between text-sm font-medium">
+          <div key={o.id} className="bg-[#fdfbf7] border border-[#e8d5d0] rounded p-3">
+            <div className="flex justify-between text-sm font-medium text-[#1a1a1a]">
               <span>#{o.numero} — M{o.mesa.numero}</span>
-              <span className="text-zinc-400">${Number(o.total).toLocaleString()}</span>
+              <span className="text-[#9a8a86]">${Number(o.total).toLocaleString()}</span>
             </div>
-            <div className="text-xs text-zinc-400 mt-1">{o.items.length} items • {new Date(o.createdAt).toLocaleTimeString()}</div>
-            <ul className="text-xs mt-2 space-y-1">
+            <div className="text-xs text-[#9a8a86] mt-1">{o.items.length} items • {new Date(o.createdAt).toLocaleTimeString()}</div>
+            <ul className="text-xs mt-2 space-y-1 text-[#5a4a47]">
               {o.items.map((it: any) => (
                 <li key={it.id} className="flex justify-between">
                   <span>{it.cantidad}x {it.productNombre}</span>
@@ -47,12 +47,12 @@ export default async function PedidosPage() {
                 </li>
               ))}
             </ul>
-            {o.notas && <div className="text-xs bg-yellow-500/10 text-yellow-300 mt-2 p-1.5 rounded">Nota: {o.notas}</div>}
+            {o.notas && <div className="text-xs bg-[#fef3c7] text-[#92400e] mt-2 p-1.5 rounded">Nota: {o.notas}</div>}
             {next && (
               <form action={updateEstado} className="mt-3">
                 <input type="hidden" name="id" value={o.id} />
                 <input type="hidden" name="estado" value={next} />
-                <button className="w-full bg-white text-black text-xs py-1.5 rounded font-medium hover:bg-zinc-200">
+                <button className="w-full bg-[#1a1a1a] text-[#fdfbf7] text-xs py-1.5 rounded font-medium hover:bg-black">
                   → {next.replace('_', ' ')}
                 </button>
               </form>
@@ -61,30 +61,25 @@ export default async function PedidosPage() {
               <form action={updateEstado} className="mt-3">
                 <input type="hidden" name="id" value={o.id} />
                 <input type="hidden" name="estado" value="entregado" />
-                <button className="w-full bg-green-500 text-black text-xs py-1.5 rounded font-medium">✓ Entregado</button>
+                <button className="w-full bg-[#7a9e7e] text-white text-xs py-1.5 rounded font-medium">✓ Entregado</button>
               </form>
             )}
           </div>
         ))}
-        {orders.length === 0 && <div className="text-xs text-zinc-600 text-center py-4">Vacío</div>}
+        {orders.length === 0 && <div className="text-xs text-[#9a8a86] text-center py-4">Vacío</div>}
       </div>
     </div>
   );
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-1">Pedidos</h1>
-      <p className="text-zinc-500 text-sm mb-6">Flujo: nuevo → en_preparacion → listo → entregado • Realtime via trigger + mesa estado auto</p>
-
+    <div style={{ fontFamily: 'Inter, sans-serif' }}>
+      <h1 className="text-2xl font-light tracking-wide text-[#1a1a1a] mb-1" style={{ fontFamily: 'Playfair Display, serif' }}>Pedidos</h1>
+      <p className="text-[#9a8a86] text-sm mb-6">Flujo: nuevo → en_preparacion → listo → entregado</p>
       <div className="grid md:grid-cols-4 gap-4">
-        <Column title="Nuevo" estado="nuevo" orders={grouped.nuevo} next="en_preparacion" />
-        <Column title="En preparación" estado="en_preparacion" orders={grouped.en_preparacion} next="listo" />
-        <Column title="Listo" estado="listo" orders={grouped.listo} next={null} />
-        <Column title="Entregado" estado="entregado" orders={grouped.entregado} next={null} />
-      </div>
-
-      <div className="mt-6 text-xs text-zinc-600">
-        Tabla: orders (estado) → trigger sync_mesa_estado → mesas.estado • Historial en order_status_history • Vista v_pedidos_activos
+        <Column title="Nuevo" orders={grouped.nuevo} next="en_preparacion" />
+        <Column title="En preparación" orders={grouped.en_preparacion} next="listo" />
+        <Column title="Listo" orders={grouped.listo} next={null} />
+        <Column title="Entregado" orders={grouped.entregado} next={null} />
       </div>
     </div>
   );

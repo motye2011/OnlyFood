@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 
 export default function LunaChat() {
   const [messages, setMessages] = useState<{ role: 'user' | 'luna'; text: string }[]>([
@@ -22,7 +22,6 @@ export default function LunaChat() {
     const data = await res.json();
     const reply = data.text || data.error || 'Error';
     setMessages((m) => [...m, { role: 'luna', text: reply }]);
-    // Voz
     if ('speechSynthesis' in window) {
       const utter = new SpeechSynthesisUtterance(reply);
       utter.lang = 'es-CO';
@@ -51,17 +50,14 @@ export default function LunaChat() {
     setListening(true);
     rec.onresult = (e: any) => {
       const transcript = Array.from(e.results).map((r: any) => r[0].transcript).join(' ').toLowerCase();
-      console.log('transcript', transcript);
       if (transcript.includes('luna')) {
         setWakeActive(true);
-        // Extrae comando después de "luna"
         const idx = transcript.lastIndexOf('luna');
         const command = transcript.slice(idx + 4).trim();
         if (command.length > 3) {
           sendMessage(command);
           setTimeout(() => setWakeActive(false), 3000);
         }
-        // vibra
         if (navigator.vibrate) navigator.vibrate(100);
       }
     };
@@ -74,16 +70,16 @@ export default function LunaChat() {
   }
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+    <div className="bg-white border border-[#e8d5d0] rounded-lg p-4" style={{ fontFamily: 'Inter, sans-serif' }}>
       <div className="flex justify-between items-center mb-3">
-        <h3 className="font-semibold">Chat con Luna</h3>
-        <button onClick={toggleListen} className={`px-3 py-1.5 rounded-full text-xs font-medium ${listening ? (wakeActive ? 'bg-green-500 text-black animate-pulse' : 'bg-yellow-500 text-black') : 'bg-zinc-800 text-white'}`}>
+        <h3 className="font-light text-[#1a1a1a]" style={{ fontFamily: 'Playfair Display, serif' }}>Chat con Luna</h3>
+        <button onClick={toggleListen} className={`px-3 py-1.5 rounded-full text-xs font-medium border ${listening ? (wakeActive ? 'bg-[#dcfce7] text-[#166534] border-[#86efac] animate-pulse' : 'bg-[#fef3c7] text-[#92400e] border-[#fcd34d]') : 'bg-[#fdfbf7] text-[#5a4a47] border-[#e8d5d0]'}`}>
           {listening ? (wakeActive ? '● Luna activa' : '● Escuchando "luna"...') : '🎤 Activar voz "luna"'}
         </button>
       </div>
-      <div className="bg-zinc-950 border border-zinc-800 rounded h-64 overflow-auto p-3 space-y-2 mb-3">
+      <div className="bg-[#fdfbf7] border border-[#e8d5d0] rounded h-64 overflow-auto p-3 space-y-2 mb-3">
         {messages.map((m, i) => (
-          <div key={i} className={`p-2 rounded text-sm max-w-[85%] ${m.role === 'user' ? 'bg-white text-black ml-auto' : 'bg-zinc-800 text-white'}`}>
+          <div key={i} className={`p-2 rounded text-sm max-w-[85%] ${m.role === 'user' ? 'bg-[#1a1a1a] text-white ml-auto' : 'bg-white border border-[#e8d5d0] text-[#1a1a1a]'}`}>
             {m.text}
           </div>
         ))}
@@ -94,12 +90,12 @@ export default function LunaChat() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && sendMessage(input)}
           placeholder='Escribe o di "luna manda pendientes a cocina"...'
-          className="flex-1 bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-sm"
+          className="flex-1 bg-[#fdfbf7] border border-[#e8d5d0] rounded px-3 py-2 text-sm text-[#1a1a1a] placeholder-[#9a8a86]"
         />
-        <button onClick={() => sendMessage(input)} className="bg-white text-black px-4 py-2 rounded text-sm font-medium">Enviar</button>
+        <button onClick={() => sendMessage(input)} className="bg-[#1a1a1a] text-[#fdfbf7] px-4 py-2 rounded text-sm font-medium">Enviar</button>
       </div>
-      <div className="text-[11px] text-zinc-500 mt-2">
-        Voz: Chrome/Edge + micrófono permitido. Di <b>"luna"</b> + orden. Texto: funciona sin voz. Tools: get_top_productos(20 días), update_pedidos_bulk, update_precio.
+      <div className="text-[11px] text-[#9a8a86] mt-2">
+        Voz: Chrome/Edge + micrófono permitido. Di <b>"luna"</b> + orden. Texto: funciona sin voz.
       </div>
     </div>
   );

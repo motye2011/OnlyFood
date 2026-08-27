@@ -17,33 +17,32 @@ export default async function LunaPage() {
   `;
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-1">Luna-Worker <span className="text-sm font-normal text-zinc-400">— IA de gestión</span></h1>
-      <p className="text-zinc-500 text-sm mb-6">Fork de luna-2.0 adaptado a trabajador • psique-trabajador.js + tools-restaurante.js • Gemini 2.5 Flash-Lite</p>
+    <div style={{ fontFamily: 'Inter, sans-serif' }}>
+      <h1 className="text-2xl font-light tracking-wide text-[#1a1a1a] mb-1" style={{ fontFamily: 'Playfair Display, serif' }}>Luna-Worker <span className="text-sm font-light text-[#9a8a86]">— IA de gestión</span></h1>
+      <p className="text-[#9a8a86] text-sm mb-6">Fork de luna-2.0 adaptado a trabajador • psique-trabajador.js + tools-restaurante.js • Gemini 1.5 Flash</p>
 
       <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-          <h2 className="font-semibold mb-3">Estado actual (tools)</h2>
+        <div className="bg-white border border-[#e8d5d0] rounded-lg p-4">
+          <h2 className="font-light mb-3 text-[#1a1a1a]" style={{ fontFamily: 'Playfair Display, serif' }}>Estado actual</h2>
           <div className="space-y-2 text-sm">
-            <div className="flex justify-between bg-zinc-950 p-2 rounded"><span>Pedidos pendientes</span><span className="font-bold">{pedidosPendientes}</span></div>
-            <div className="flex justify-between bg-zinc-950 p-2 rounded"><span>Mesas ocupadas</span><span>{Number(d?.mesas_ocupadas ?? 0)}</span></div>
-            <div className="flex justify-between bg-zinc-950 p-2 rounded"><span>Ventas hoy</span><span>${Number(d?.ventas_hoy ?? 0).toLocaleString()}</span></div>
+            <div className="flex justify-between bg-[#fdfbf7] border border-[#e8d5d0] p-2 rounded"><span className="text-[#5a4a47]">Pedidos pendientes</span><span className="font-medium text-[#1a1a1a]">{pedidosPendientes}</span></div>
+            <div className="flex justify-between bg-[#fdfbf7] border border-[#e8d5d0] p-2 rounded"><span className="text-[#5a4a47]">Mesas ocupadas</span><span className="text-[#1a1a1a]">{Number(d?.mesas_ocupadas ?? 0)}</span></div>
+            <div className="flex justify-between bg-[#fdfbf7] border border-[#e8d5d0] p-2 rounded"><span className="text-[#5a4a47]">Ventas hoy</span><span className="text-[#1a1a1a]">${Number(d?.ventas_hoy ?? 0).toLocaleString()}</span></div>
           </div>
-          <div className="text-xs text-zinc-600 mt-3">Tools disponibles: get_pedidos, get_ventas, get_top_productos, update_precio, update_disponibilidad, create_producto, generate_descripcion, create_categoria</div>
+          <div className="text-xs text-[#9a8a86] mt-3">Tools: get_pedidos, get_ventas, get_top_productos, update_precio, create_producto</div>
         </div>
 
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-          <h2 className="font-semibold mb-3">Top productos (análisis)</h2>
-          {(topProducts as any[]).length === 0 ? <p className="text-sm text-zinc-500">Sin ventas aún</p> :
+        <div className="bg-white border border-[#e8d5d0] rounded-lg p-4">
+          <h2 className="font-light mb-3 text-[#1a1a1a]" style={{ fontFamily: 'Playfair Display, serif' }}>Top productos</h2>
+          {(topProducts as any[]).length === 0 ? <p className="text-sm text-[#9a8a86]">Sin ventas aún</p> :
             <div className="space-y-2">
               {(topProducts as any[]).map((p: any) => (
-                <div key={p.nombre} className="flex justify-between bg-zinc-950 p-2 rounded text-sm">
-                  <span>{p.nombre}</span><span className="text-zinc-400">{Number(p.unidades)} uds</span>
+                <div key={p.nombre} className="flex justify-between bg-[#fdfbf7] border border-[#e8d5d0] p-2 rounded text-sm">
+                  <span className="text-[#1a1a1a]">{p.nombre}</span><span className="text-[#9a8a86]">{Number(p.unidades)} uds</span>
                 </div>
               ))}
             </div>
           }
-          <div className="text-xs text-zinc-600 mt-3">En prod: Luna ejecutará este análisis y propondrá combos/promos vía agente.</div>
         </div>
       </div>
 
@@ -51,8 +50,8 @@ export default async function LunaPage() {
         <LunaChat />
       </div>
 
-      <div className="mt-4 text-xs text-zinc-600">
-        Memoria por restaurante: memoria/{RESTAURANT_ID}.json • Causalidad obligatoria (cita episodio) → auditoría • RLS por restaurant_id
+      <div className="mt-4 text-xs text-[#9a8a86]">
+        Memoria por restaurante: memoria/{RESTAURANT_ID}.json • Causalidad obligatoria → auditoría
       </div>
     </div>
   );
