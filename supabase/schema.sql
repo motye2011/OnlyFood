@@ -22,6 +22,14 @@ do $$ begin create type order_status as enum ('nuevo','en_preparacion','listo','
 do $$ begin create type mesa_estado as enum ('libre','ocupada','reservada','fuera_servicio'); exception when duplicate_object then null; end $$;
 do $$ begin create type model_status as enum ('pendiente','generando','listo','error'); exception when duplicate_object then null; end $$;
 
+-- Compatibilidad local: si no es Supabase, crea schema auth mock
+create schema if not exists auth;
+create table if not exists auth.users (
+  id uuid primary key default uuid_generate_v4(),
+  email text unique,
+  created_at timestamptz default now()
+);
+
 -- ============================================================
 -- 3. RESTAURANTES (TENANT PRINCIPAL)
 -- ============================================================
