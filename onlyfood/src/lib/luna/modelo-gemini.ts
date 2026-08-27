@@ -88,17 +88,32 @@ export async function handleKeywordCommand(text: string) {
     return `Mesas: ${ocupadas}/${mesas.length} ocupadas. ${mesas.map((m: any) => `M${m.numero}:${m.estado}`).join(', ')}`;
   }
   if (t.includes('agrega') && (t.includes('hamburguesa') || t.includes('plato') || t.includes('producto'))) {
-    // Extrae nombre entre "agrega" y "ingredientes" o hasta fin
-    const nombreMatch = t.match(/agrega\s+([a-záéíóúñ\s]+?)(?:ingredientes|con|$)/);
+    const nombreMatch = t.match(/agrega\s+([a-záéíóúñ\s]+?)(?:ingredientes|con|por|$)/);
     let nombre = nombreMatch ? nombreMatch[1].trim() : 'Nuevo producto';
-    // Limpia "un nuevo plato," etc
     nombre = nombre.replace(/un nuevo plato,?/, '').replace(/agrega/, '').trim();
-    if (nombre.length < 3) nombre = 'Hamburguesa Doble';
-    // Capitaliza
+    if (nombre.length < 3) nombre = 'Hamburguesa';
     nombre = nombre.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    const ingMatch = t.match(/ingredientes\s*\(([^)]+)\)/);
-    const ingredientes = ingMatch ? ingMatch[1] : '';
-    const r: any = await (toolMap as any).create_producto({ nombre, precio: 28000, descripcion: `Creado por Luna`, categoria: 'Hamburguesas', ingredientes });
+    // Ingredientes: con () o con "con ..." hasta "por $"
+    let ingredientes = '';
+    const ingParen = t.match(/ingredientes\s*\(([^)]+)\)/);
+    if (ingParen) ingredientes = ingParen[1];
+    else {
+      const conMatch = t.match(/con\s+([^]+?)(?:\s+por\s+\d|$)/);
+      if (conMatch) ingredientes = conMatch[1].trim();
+      else {
+        const ingSinParen = t.match(/ingredientes\s+([a-z0-9,\s]+?)(?:\s+por|$)/);
+        if (ingSinParen) ingredientes = ingSinParen[1].trim();
+      }
+    }
+    // Precio: por 40.000$ o 40000
+    let precio = 28000;
+    const precioMatch = t.match(/por\s+(\d+[\.,]?\d*)\s*\$?/) || t.match(/(\d+[\.,]\d+)\s*\$/) || t.match(/(\d{4,})\s*\$?/);
+    if (precioMatch) {
+      const raw = precioMatch[1].replace(/\./g, '').replace(/,/g, '');
+      const p = parseInt(raw);
+      if (!isNaN(p) && p > 1000) precio = p;
+    }
+    const r: any = await (toolMap as any).create_producto({ nombre, precio, descripcion: `Creado por Luna`, categoria: 'Hamburguesas', ingredientes });
     if (r.ok) return `Listo, creé "${r.producto}" a $${r.precio.toLocaleString()} con ingredientes: ${ingredientes || 'no especificados'}. Ya está en /panel/productos.`;
     return r.error || 'No pude crear el producto';
   }
