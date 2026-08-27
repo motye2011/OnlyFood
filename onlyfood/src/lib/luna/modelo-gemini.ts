@@ -19,8 +19,11 @@ export async function chatWithLuna(message: string, history: { role: string; con
     generationConfig: { temperature: config.modelo.temperature, maxOutputTokens: config.modelo.maxTokens },
   });
 
+  // Gemini exige que history empiece con 'user', filtra saludo inicial de Luna
+  let cleanHistory = history.filter((h) => h.content && h.content.trim().length > 0);
+  while (cleanHistory.length > 0 && cleanHistory[0].role !== 'user') cleanHistory.shift();
   const chat = model.startChat({
-    history: history.map((h) => ({ role: h.role === 'user' ? 'user' : 'model', parts: [{ text: h.content }] })),
+    history: cleanHistory.map((h) => ({ role: h.role === 'user' ? 'user' : 'model', parts: [{ text: h.content }] })),
   });
 
   let result = await chat.sendMessage(message);

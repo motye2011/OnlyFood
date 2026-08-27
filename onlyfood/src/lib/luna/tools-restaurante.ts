@@ -80,6 +80,21 @@ export const toolDeclarations = [
     description: 'Estado de mesas (libre/ocupada)',
     parameters: { type: 'object', properties: {} },
   },
+  {
+    name: 'create_producto',
+    description: 'Crea un nuevo producto/plato. Para "agrega hamburguesa doble con ingredientes..."',
+    parameters: {
+      type: 'object',
+      properties: {
+        nombre: { type: 'string', description: 'Nombre del plato' },
+        precio: { type: 'number', description: 'Precio, si no se dice usa 25000' },
+        descripcion: { type: 'string', description: 'Descripción corta' },
+        categoria: { type: 'string', description: 'Categoría' },
+        ingredientes: { type: 'string', description: 'Ingredientes separados por coma' },
+      },
+      required: ['nombre'],
+    },
+  },
 ];
 
 // Implementaciones
@@ -136,6 +151,19 @@ export async function get_mesas_estado() {
   return mesas;
 }
 
+export async function create_producto({ nombre, precio = 25000, descripcion = '', categoria = 'General', ingredientes = '' }) {
+  let categoryId = null;
+  if (categoria) {
+    let cat = await prisma.category.findFirst({ where: { restaurantId: RESTAURANT_ID, nombre: categoria } });
+    if (!cat) cat = await prisma.category.create({ data: { restaurantId: RESTAURANT_ID, nombre: categoria } });
+    categoryId = cat.id;
+  }
+  const p = await prisma.product.create({
+    data: { restaurantId: RESTAURANT_ID, categoryId, nombre, precio, descripcion, ingredientes, disponible: true },
+  });
+  return { ok: true, producto: p.nombre, id: p.id, precio: Number(p.precio) };
+}
+
 export const toolMap = {
   get_pedidos,
   get_top_productos,
@@ -144,4 +172,5 @@ export const toolMap = {
   update_precio,
   update_disponibilidad,
   get_mesas_estado,
+  create_producto,
 };
