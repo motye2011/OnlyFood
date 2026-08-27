@@ -1,0 +1,1 @@
+﻿import { NextResponse } from 'next/server'; import { prisma } from '@/lib/prisma'; export async function GET() { const r = await prisma.restaurant.count(); const m = await prisma.mesa.count(); const o = await prisma.order.count(); return NextResponse.json({ status: 'ok', db: 'Onlyfood', restaurants: r, mesas: m, orders: o }); }

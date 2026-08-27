@@ -1,0 +1,372 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRol {
+  admin
+  trabajador
+}
+
+enum TrabajadorTipo {
+  cocina
+  mesero
+  cajero
+  admin
+}
+
+enum OrderStatus {
+  nuevo
+  en_preparacion
+  listo
+  entregado
+  cancelado
+}
+
+enum MesaEstado {
+  libre
+  ocupada
+  reservada
+  fuera_servicio
+}
+
+enum ModelStatus {
+  pendiente
+  generando
+  listo
+  error
+}
+
+model Restaurant {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nombre      String
+  slug        String   @unique
+  descripcion String?
+  logoUrl     String?  @map("logo_url")
+  telefono    String?
+  direccion   String?
+  horario     Json?
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  categories         Category[]
+  products           Product[]
+  extras             Extra[]
+  mesas              Mesa[]
+  orders             Order[]
+  mesaSessions       MesaSession[]
+  productModels      ProductModel[]
+  qrScans            QrScan[]
+  productViews       ProductView[]
+  modelViews         ModelView[]
+  profiles           Profile[]
+  counters           RestaurantCounter?
+
+  @@map("restaurants")
+}
+
+model Profile {
+  id             String         @id @db.Uuid // references auth.users
+  restaurantId   String         @map("restaurant_id") @db.Uuid
+  email          String
+  nombre         String
+  rol            UserRol        @default(trabajador)
+  trabajadorTipo TrabajadorTipo? @map("trabajador_tipo")
+  avatarUrl      String?        @map("avatar_url")
+  activo         Boolean        @default(true)
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime       @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([email, restaurantId])
+  @@index([restaurantId])
+  @@map("profiles")
+}
+
+model Category {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId String   @map("restaurant_id") @db.Uuid
+  nombre       String
+  descripcion  String?
+  orden        Int      @default(0)
+  activo       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  products   Product[]
+
+  @@unique([restaurantId, nombre])
+  @@index([restaurantId])
+  @@map("categories")
+}
+
+model Product {
+  id                    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId          String   @map("restaurant_id") @db.Uuid
+  categoryId            String?  @map("category_id") @db.Uuid
+  nombre                String
+  descripcion           String?
+  precio                Decimal  @db.Decimal(10, 2)
+  imagenUrl             String?  @map("imagen_url")
+  disponible            Boolean  @default(true)
+  destacado             Boolean  @default(false)
+  ingredientes          String?
+  alergenos             String?
+  infoNutricional       Json?    @map("info_nutricional")
+  tiempoPreparacionMin  Int?     @map("tiempo_preparacion_min")
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt             DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  restaurant     Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  category       Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  images         ProductImage[]
+  productExtras  ProductExtra[]
+  productModels  ProductModel[]
+  orderItems     OrderItem[]
+  productViews   ProductView[]
+  modelViews     ModelView[]
+
+  @@index([restaurantId])
+  @@index([categoryId])
+  @@map("products")
+}
+
+model ProductImage {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId String   @map("product_id") @db.Uuid
+  url       String
+  orden     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+model Extra {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId String   @map("restaurant_id") @db.Uuid
+  nombre       String
+  precio       Decimal  @default(0) @db.Decimal(10, 2)
+  disponible   Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  restaurant     Restaurant     @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  productExtras  ProductExtra[]
+  orderItemExtras OrderItemExtra[]
+
+  @@unique([restaurantId, nombre])
+  @@map("extras")
+}
+
+model ProductExtra {
+  productId String @map("product_id") @db.Uuid
+  extraId   String @map("extra_id") @db.Uuid
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  extra   Extra   @relation(fields: [extraId], references: [id], onDelete: Cascade)
+
+  @@id([productId, extraId])
+  @@map("product_extras")
+}
+
+model Mesa {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId String     @map("restaurant_id") @db.Uuid
+  numero       Int
+  nombre       String?
+  capacidad    Int        @default(4)
+  estado       MesaEstado @default(libre)
+  qrToken      String     @unique @default(dbgenerated("encode(gen_random_bytes(16), 'hex')")) @map("qr_token")
+  qrUrl        String?    @map("qr_url")
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  orders       Order[]
+  sessions     MesaSession[]
+  qrScans      QrScan[]
+  productViews ProductView[]
+
+  @@unique([restaurantId, numero])
+  @@index([restaurantId])
+  @@index([qrToken])
+  @@map("mesas")
+}
+
+model MesaSession {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  mesaId       String   @map("mesa_id") @db.Uuid
+  restaurantId String   @map("restaurant_id") @db.Uuid
+  token        String   @unique @default(dbgenerated("encode(gen_random_bytes(16), 'hex')"))
+  userAgent    String?  @map("user_agent")
+  ip           String?
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  expiresAt    DateTime @default(dbgenerated("now() + interval '4 hours'")) @map("expires_at") @db.Timestamptz
+
+  mesa       Mesa       @relation(fields: [mesaId], references: [id], onDelete: Cascade)
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  orders     Order[]
+  qrScans    QrScan[]
+
+  @@index([mesaId])
+  @@map("mesa_sessions")
+}
+
+model Order {
+  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId String      @map("restaurant_id") @db.Uuid
+  mesaId       String      @map("mesa_id") @db.Uuid
+  sessionId    String?     @map("session_id") @db.Uuid
+  numero       Int
+  estado       OrderStatus @default(nuevo)
+  total        Decimal     @default(0) @db.Decimal(10, 2)
+  subtotal     Decimal?    @default(0) @db.Decimal(10, 2)
+  notas        String?
+  clienteNombre String?    @map("cliente_nombre")
+  createdBy    String?     @map("created_by") @db.Uuid
+  createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  deliveredAt  DateTime?   @map("delivered_at") @db.Timestamptz
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  mesa       Mesa       @relation(fields: [mesaId], references: [id], onDelete: Restrict)
+  session    MesaSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  items      OrderItem[]
+  history    OrderStatusHistory[]
+
+  @@index([restaurantId])
+  @@index([mesaId])
+  @@index([restaurantId, estado])
+  @@map("orders")
+}
+
+model OrderItem {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId         String   @map("order_id") @db.Uuid
+  productId       String   @map("product_id") @db.Uuid
+  productNombre   String   @map("product_nombre")
+  cantidad        Int
+  precioUnitario  Decimal  @map("precio_unitario") @db.Decimal(10, 2)
+  subtotal        Decimal  @db.Decimal(10, 2)
+  notas           String?
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  extras OrderItemExtra[]
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model OrderItemExtra {
+  id            String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderItemId   String @map("order_item_id") @db.Uuid
+  extraId       String @map("extra_id") @db.Uuid
+  extraNombre   String @map("extra_nombre")
+  precio        Decimal @default(0) @db.Decimal(10, 2)
+
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  extra     Extra     @relation(fields: [extraId], references: [id], onDelete: Restrict)
+
+  @@map("order_item_extras")
+}
+
+model OrderStatusHistory {
+  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId         String      @map("order_id") @db.Uuid
+  estadoAnterior  OrderStatus? @map("estado_anterior")
+  estadoNuevo     OrderStatus @map("estado_nuevo")
+  changedBy       String?     @map("changed_by") @db.Uuid
+  changedAt       DateTime    @default(now()) @map("changed_at") @db.Timestamptz
+  notas           String?
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("order_status_history")
+}
+
+model ProductModel {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId     String      @map("product_id") @db.Uuid
+  restaurantId  String      @map("restaurant_id") @db.Uuid
+  status        ModelStatus @default(pendiente)
+  glbUrl        String?     @map("glb_url")
+  usdzUrl       String?     @map("usdz_url")
+  sourceImages  String[]    @map("source_images")
+  provider      String?
+  providerJobId String?     @map("provider_job_id")
+  errorMsg      String?     @map("error_msg")
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  product    Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_models")
+}
+
+model QrScan {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId String   @map("restaurant_id") @db.Uuid
+  mesaId       String?  @map("mesa_id") @db.Uuid
+  sessionId    String?  @map("session_id") @db.Uuid
+  scannedAt    DateTime @default(now()) @map("scanned_at") @db.Timestamptz
+  userAgent    String?  @map("user_agent")
+  ip           String?
+
+  restaurant Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  mesa       Mesa?       @relation(fields: [mesaId], references: [id], onDelete: SetNull)
+  session    MesaSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+  @@index([restaurantId, scannedAt])
+  @@map("qr_scans")
+}
+
+model ProductView {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId String   @map("restaurant_id") @db.Uuid
+  productId    String   @map("product_id") @db.Uuid
+  mesaId       String?  @map("mesa_id") @db.Uuid
+  viewedAt     DateTime @default(now()) @map("viewed_at") @db.Timestamptz
+  source       String?
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  product    Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  mesa       Mesa?      @relation(fields: [mesaId], references: [id], onDelete: SetNull)
+
+  @@index([productId])
+  @@map("product_views")
+}
+
+model ModelView {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  restaurantId String   @map("restaurant_id") @db.Uuid
+  productId    String   @map("product_id") @db.Uuid
+  tipo         String?
+  viewedAt     DateTime @default(now()) @map("viewed_at") @db.Timestamptz
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  product    Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("model_views")
+}
+
+model RestaurantCounter {
+  restaurantId String @id @map("restaurant_id") @db.Uuid
+  nextOrderNum Int    @default(1) @map("next_order_num")
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@map("restaurant_counters")
+}
