@@ -138,34 +138,34 @@ Si cobras **$25 - $40 / mes por restaurante**, con 10 clientes ya eres rentable.
 
 | Concepto | Costo USD | Costo COP* |
 | :--- | :--- | :--- |
-| Dominio onlyfood.com (1 año) + SSL | $15 | $60.000 |
+| Dominio onlyfood.com (1 año) + SSL | $15 | $46.500 |
 | Diseño UI/UX + branding | $0 (equipo) | $0 |
-| Lote inicial 3D (50 productos demo con Meshy) | $15 | $60.000 |
-| **Subtotal único** | **$30** | **$120.000** |
+| Lote inicial 3D (50 productos demo con Meshy) | $15 | $46.500 |
+| **Subtotal único** | **$30** | **$93.000** |
 
 **B. Costos Mensuales Recurrentes (Producción)**
 
 | Concepto | Proveedor | Mensual USD | Mensual COP |
 | :--- | :--- | :--- | :--- |
-| Backend/DB/Auth/Realtime/Storage 8GB | Supabase Pro | $25 | $100.000 |
-| Hosting Frontend + Edge | Vercel Pro (team) | $20 | $80.000 |
-| VPS Luna-Worker + Worker 3D | Oracle Free Tier (gratis 2 años) / Fly.io | $0 - $15 | $0 - $60.000 |
-| Almacenamiento modelos 3D/CDN (100GB) | Supabase Storage + Cloudflare R2 | $10 | $40.000 |
-| IA 3D - 100 modelos/mes nuevos | Meshy API $0.25 c/u | $25 | $100.000 |
-| IA Luna-Worker 20 restaurantes (100 consultas/día c/u) | Gemini 2.5 Flash-Lite $1.5 c/u | $30 | $120.000 |
-| Monitoreo/logs (Sentry, Uptime) | Hobby | $10 | $40.000 |
-| **Subtotal mensual (20 restaurantes)** | | **$120 - $135** | **$480.000 - $540.000** |
-| **Subtotal mensual (50 restaurantes)** | | **$155** | **$620.000** |
+| Backend/DB/Auth/Realtime/Storage 8GB | Supabase Pro | $25 | $77.500 |
+| Hosting Frontend + Edge | Vercel Pro (team) | $20 | $62.000 |
+| VPS Luna-Worker + Worker 3D | Oracle Free Tier (gratis 2 años) / Fly.io | $0 - $15 | $0 - $46.500 |
+| Almacenamiento modelos 3D/CDN (100GB) | Supabase Storage + Cloudflare R2 | $10 | $31.000 |
+| IA 3D - 100 modelos/mes nuevos | Meshy API $0.25 c/u | $25 | $77.500 |
+| IA Luna-Worker 20 restaurantes (100 consultas/día c/u) | Gemini 2.5 Flash-Lite $1.5 c/u | $30 | $93.000 |
+| Monitoreo/logs (Sentry, Uptime) | Hobby | $10 | $31.000 |
+| **Subtotal mensual (20 restaurantes)** | | **$120 - $135** | **$372.000 - $418.500** |
+| **Subtotal mensual (50 restaurantes)** | | **$155** | **$480.500** |
 
 **C. Paquete Patrocinio Propuesto**
 
 | Paquete | Duración | Total USD | Total COP | Qué cubre |
 | :--- | :--- | :--- | :--- | :--- |
-| **Piloto** | 6 meses | **$750** | **$3.000.000** | Infra completa + 20 restaurantes + 300 modelos 3D |
-| **Escala** | 12 meses | **$1.500** | **$6.000.000** | Infra + 50 restaurantes + 600 modelos 3D |
-| **Piloto + Estipendio equipo (opcional)** | 6 meses | **$2.500** | **$10.000.000** | Anterior + $290/mes estipendio 5 integrantes |
+| **Piloto** | 6 meses | **$750** | **$2.325.000** | Infra completa + 20 restaurantes + 300 modelos 3D |
+| **Escala** | 12 meses | **$1.500** | **$4.650.000** | Infra + 50 restaurantes + 600 modelos 3D |
+| **Piloto + Estipendio equipo (opcional)** | 6 meses | **$2.500** | **$7.750.000** | Anterior + $290/mes estipendio 5 integrantes |
 
-* Tasa referencia: $1 USD = $4.000 COP
+* Tasa referencia: $1 USD = $3.100 COP
 
 > **Nota patrocinador:** Con $750 por 6 meses la plataforma opera sin costo para 20 restaurantes piloto. A $30/mes por restaurante, con 10 clientes ya se autofinancia ($300/mes ingreso vs $135 costo = **$165 utilidad/mes**). El patrocinio solo es capital semilla, luego es autosostenible. Infra Oracle Free reduce $180/año.
 
