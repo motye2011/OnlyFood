@@ -52,6 +52,18 @@ QR Mesa -> Menú Web -> Visor 3D / AR -> Carrito -> Pedido -> Panel/Cocina -> Lu
 - IA Agente: Luna-Worker (servidor.js + modelo.js híbrido) -> Gemini 2.5 Flash por defecto
 - Deploy: Vercel (frontend) + Oracle VPS / Fly.io (Luna-Worker + Worker 3D)
 
+### 1.4 Equipo (5 integrantes)
+
+| Rol | Integrante | Responsabilidad principal |
+| :--- | :--- | :--- |
+| 🧭 PM | Jose Luis | Roadmap, requisitos, QA, demo, coordinación 30 días |
+| ⚙️ DevOps | German | Supabase, Vercel, Oracle VPS, CI/CD, Docker, dominios, Realtime |
+| 🎨 Frontend | Deimer | Panel gestión, Menú web, Carrito, Visor 3D/AR (model-viewer) |
+| 🔧 Backend | Keiner | Auth multi-tenant, Productos, Mesas/QR, Pedidos, WebSockets, Storage |
+| 🔧 Backend | Motta | Fork Luna-Worker, Tools restaurante, Gemini API, analítica |
+
+> Con 5 se puede paralelizar: Frontend y Backend trabajan simultáneo en MVP1 (7-10 días en vez de 14).
+
 ## 2. Arquitectura
 
 ```
@@ -118,26 +130,26 @@ Gemini tiene **free tier 1.500 req/día** -> MVP4 gratis durante piloto.
 
 Si cobras **$25 - $40 / mes por restaurante**, con 10 clientes ya eres rentable.
 
-### 3.5 Tiempo de Entrega - 30 Días (Equipo 2-3 devs)
+### 3.5 Tiempo de Entrega - 30 Días (Equipo 5)
 
-> **Deadline: 1 mes - Entrega completa MVP1-MVP5**
+> **Deadline: 1 mes - Entrega completa MVP1-MVP5 con 5 integrantes**
 
-| Semana | Días | Entregable |
-| :--- | :--- | :--- |
-| **1-2** | 1-14 | **MVP1 Base** - Auth, Productos, Mesas/QR, Menú, Carrito, Pedidos Realtime, Cocina, Dashboard |
-| **3** | 15-22 | **MVP2+3 3D/AR** - Upload, Cola 3D, visor model-viewer, botón AR |
-| **4** | 22-27 | **MVP4 Luna-Worker** - Fork Luna + Tools + Gemini Flash-Lite |
-| **4** | 28-30 | **MVP5 + QA/Deploy** - Analítica + pruebas E2E + deploy prod + demo |
+| Semana | Días | Entregable | Responsables |
+| :--- | :--- | :--- | :--- |
+| **1-2** | 1-12 | **MVP1 Base** - Auth, Productos, Mesas/QR, Menú, Carrito, Pedidos Realtime, Cocina, Dashboard | German (infra) + Deimer (FE) + Keiner (BE) + PM valida |
+| **3** | 13-20 | **MVP2+3 3D/AR** - Upload, Cola 3D, visor model-viewer, botón AR | Deimer (visor) + Keiner (upload/cola) + German (Storage) |
+| **4** | 20-26 | **MVP4 Luna-Worker** - Fork Luna + Tools + Gemini Flash-Lite | Motta (fork + tools) + Keiner (API restaurante) |
+| **4** | 27-30 | **MVP5 + QA/Deploy** - Analítica + pruebas E2E + deploy prod + demo | Todos - Jose Luis coordina demo final |
 
-*Para cumplir en 30 días: 2 devs en paralelo (1 frontend/menú + 1 backend/panel) o recortar MVP5 a métricas básicas.*
+*Con 5 se hace en paralelo: MVP1 se cierra en 12 días en vez de 14. DevOps deja infra lista día 1 para no bloquear.*
 
-## 4. Roadmap 30 Días
+## 4. Roadmap 30 Días Detallado
 
-1. **Día 1-2:** Setup Supabase + Next.js + Auth multi-tenant
-2. **Día 3-14:** MVP1 completo y testeado con 1 restaurante piloto
-3. **Día 15-22:** Integración 3D/AR (Meshy API, no self-hosted)
-4. **Día 22-27:** Fork Luna-Worker con Gemini 2.5 Flash-Lite
-5. **Día 28-30:** Buffer QA, deploy Vercel + Oracle y entrega
+1. **Día 1-2:** German setup Supabase + Vercel + Oracle + repo | PM define historias
+2. **Día 3-12:** Deimer (Panel/Menú) + Keiner (API/DB/QR/Realtime) en paralelo - MVP1 testeado
+3. **Día 13-20:** Deimer integra model-viewer/AR + Keiner cola 3D con Meshy API
+4. **Día 20-26:** Motta fork Luna-Worker (psique-trabajador + tools) con Gemini 2.5 Flash-Lite
+5. **Día 27-30:** Jose Luis QA + analítica MVP5 + deploy prod + video demo
 
 ## 5. Siguiente Paso
 
