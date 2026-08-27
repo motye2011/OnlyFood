@@ -6,8 +6,9 @@ const apiKey = process.env.GEMINI_API_KEY || '';
 
 export async function chatWithLuna(message: string, history: { role: string; content: string }[] = []) {
   if (!apiKey) {
-    // Fallback sin API key: responde con datos reales de DB sin LLM
-    return { text: '⚠️ Falta GEMINI_API_KEY. Configura .env con GEMINI_API_KEY para IA completa. Mientras, puedo ejecutar tools básicos.', tools: [] };
+    const fallback = await handleKeywordCommand(message);
+    if (fallback) return { text: fallback, tools: [] };
+    return { text: '⚠️ Falta GEMINI_API_KEY. Configura .env con GEMINI_API_KEY para IA completa. Prueba: "luna revisa si hay pedidos pendientes" o "luna plato más pedido 20 días" o "luna manda pendientes a cocina"', tools: [] };
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
@@ -51,19 +52,40 @@ export async function chatWithLuna(message: string, history: { role: string; con
   return { text: response.text(), tools: [] };
 }
 
-// Fallback simple: ejecuta keyword -> tool sin LLM
+// Fallback simple: ejecuta keyword -> tool sin LLM (para demo sin API key)
 export async function handleKeywordCommand(text: string) {
-  const t = text.toLowerCase();
+  const t = text.toLowerCase().replace('luna', '').trim();
   if (t.includes('pendientes') && t.includes('cocina')) {
     const r = await (toolMap as any).update_pedidos_bulk({ from: 'nuevo', to: 'en_preparacion' });
     return `Listo, mandé ${r.actualizados} pedidos de nuevo a cocina.`;
   }
-  if (t.includes('plato más pedido') || t.includes('mas pedido')) {
+  if (t.includes('revisa') && t.includes('pedido') || t.includes('hay pedidos') || t.includes('pendientes')) {
+    const pedidos: any[] = await (toolMap as any).get_pedidos({ estado: 'nuevo', limit: 10 });
+    const prep: any[] = await (toolMap as any).get_pedidos({ estado: 'en_preparacion', limit: 10 });
+    const total = pedidos.length + prep.length;
+    if (total === 0) return 'No hay pedidos pendientes. Todo al día.';
+    return `Hay ${total} pedidos pendientes: ${pedidos.length} nuevos y ${prep.length} en preparación. ${pedidos.length > 0 ? `Siguiente: #${pedidos[0].numero} Mesa ${pedidos[0].mesa}` : ''}`;
+  }
+  if (t.includes('plato más pedido') || t.includes('mas pedido') || t.includes('más vendido')) {
     const m = t.match(/(\d+)\s*dias/);
     const days = m ? parseInt(m[1]) : 20;
     const top = await (toolMap as any).get_top_productos({ days, limit: 3 });
     if (!top.length) return `Sin ventas en los últimos ${days} días.`;
-    return `Top ${days} días: ${top.map((p: any) => `${p.nombre} (${p.ventas} pedidos)`).join(', ')}`;
+    return `Top ${days} días: ${top.map((p: any) => `${p.nombre} (${p.ventas} pedidos, ${p.unidades} uds)`).join(', ')}`;
+  }
+  if (t.includes('ventas') || t.includes('cuánto vendimos')) {
+    const m = t.match(/(\d+)\s*dias/);
+    const days = m ? parseInt(m[1]) : 7;
+    const v: any = await (toolMap as any).get_ventas({ days });
+    return `Últimos ${days} días: ${v.pedidos} pedidos, $${Number(v.ventas).toLocaleString()} en ventas.`;
+  }
+  if (t.includes('mesas')) {
+    const mesas: any[] = await (toolMap as any).get_mesas_estado();
+    const ocupadas = mesas.filter((m: any) => m.estado === 'ocupada').length;
+    return `Mesas: ${ocupadas}/${mesas.length} ocupadas. ${mesas.map((m: any) => `M${m.numero}:${m.estado}`).join(', ')}`;
+  }
+  if (t.includes('precio') || t.includes('cambia')) {
+    return 'Para cambiar precio di: "luna cambia hamburguesa clásica a 27000" — necesito GEMINI_API_KEY para eso, o usa el panel de productos.';
   }
   return null;
 }
