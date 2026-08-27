@@ -66,7 +66,7 @@ export async function handleKeywordCommand(text: string) {
     if (total === 0) return 'No hay pedidos pendientes. Todo al día.';
     return `Hay ${total} pedidos pendientes: ${pedidos.length} nuevos y ${prep.length} en preparación. ${pedidos.length > 0 ? `Siguiente: #${pedidos[0].numero} Mesa ${pedidos[0].mesa}` : ''}`;
   }
-  if (t.includes('plato más pedido') || t.includes('mas pedido') || t.includes('más vendido')) {
+  if (t.includes('plato más pedido') || t.includes('mas pedido') || t.includes('más vendido') || t.includes('mas vendido') || t.includes('productos mas vendidos')) {
     const m = t.match(/(\d+)\s*dias/);
     const days = m ? parseInt(m[1]) : 20;
     const top = await (toolMap as any).get_top_productos({ days, limit: 3 });
