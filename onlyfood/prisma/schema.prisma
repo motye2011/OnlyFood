@@ -10,6 +10,8 @@ datasource db {
 enum UserRol {
   admin
   trabajador
+
+  @@map("user_rol")
 }
 
 enum TrabajadorTipo {
@@ -17,6 +19,8 @@ enum TrabajadorTipo {
   mesero
   cajero
   admin
+
+  @@map("trabajador_tipo")
 }
 
 enum OrderStatus {
@@ -25,6 +29,8 @@ enum OrderStatus {
   listo
   entregado
   cancelado
+
+  @@map("order_status")
 }
 
 enum MesaEstado {
@@ -32,6 +38,8 @@ enum MesaEstado {
   ocupada
   reservada
   fuera_servicio
+
+  @@map("mesa_estado")
 }
 
 enum ModelStatus {
@@ -39,6 +47,8 @@ enum ModelStatus {
   generando
   listo
   error
+
+  @@map("model_status")
 }
 
 model Restaurant {
